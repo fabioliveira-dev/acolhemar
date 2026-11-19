@@ -3,6 +3,15 @@ DROP DATABASE IF EXISTS acolhemar;
 CREATE DATABASE acolhemar CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE acolhemar;
 
+-- 0. Tabela Usuario (autenticação do MVP com hash bcrypt)
+CREATE TABLE usuario (
+    id_usuario INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    senha_hash CHAR(60) NOT NULL,
+    criado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
 -- 1. Tabela Doador
 CREATE TABLE doador (
     id_doador INT AUTO_INCREMENT PRIMARY KEY,
