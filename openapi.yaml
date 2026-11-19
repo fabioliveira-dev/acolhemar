@@ -1,0 +1,211 @@
+openapi: 3.0.3
+info:
+  title: API AcolheMar
+  version: 1.0.0
+  description: API REST de gestão de doadores e doações da ONG AcolheMar (PIE II - ADS).
+servers:
+  - url: http://localhost:3000/api
+security:
+  - bearerAuth: []
+paths:
+  /health:
+    get:
+      summary: Verifica a saúde da API e da conexão com o banco de dados
+      security: []
+      responses:
+        "200":
+          description: API e banco operando normalmente
+        "500":
+          description: Falha na conexão com o banco de dados
+  /auth/login:
+    post:
+      summary: Confere e-mail e senha e devolve um token JWT
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Login"
+      responses:
+        "200":
+          description: Login aceito
+        "400":
+          description: E-mail ou senha não informados
+        "401":
+          description: E-mail ou senha inválidos
+  /doadores:
+    get:
+      summary: Lista todos os doadores ordenados por nome
+      responses:
+        "200":
+          description: Lista de doadores retornada
+        "401":
+          description: Token ausente, inválido ou expirado
+    post:
+      summary: Cadastra um novo doador
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DoadorEntrada"
+      responses:
+        "201":
+          description: Doador cadastrado com sucesso
+        "400":
+          description: "Dados obrigatórios ausentes ou inválidos"
+        "401":
+          description: Token ausente, inválido ou expirado
+        "409":
+          description: CPF ou e-mail já cadastrado
+  /doadores/{id}:
+    get:
+      summary: Busca um doador pelo identificador
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Doador encontrado
+        "401":
+          description: Token ausente, inválido ou expirado
+        "404":
+          description: Doador não encontrado
+    put:
+      summary: Atualiza os dados cadastrais de um doador
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DoadorEntrada"
+      responses:
+        "200":
+          description: Doador atualizado
+        "400":
+          description: "Dados inválidos"
+        "401":
+          description: Token ausente, inválido ou expirado
+        "404":
+          description: Doador não encontrado
+        "409":
+          description: CPF ou e-mail pertence a outro doador
+    delete:
+      summary: Exclui um doador sem doações vinculadas
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Doador excluído
+        "401":
+          description: Token ausente, inválido ou expirado
+        "404":
+          description: Doador não encontrado
+        "409":
+          description: Doador possui doações registradas
+  /itens:
+    get:
+      summary: Lista os itens ativos agrupados por categoria
+      responses:
+        "200":
+          description: Catálogo de itens retornado
+        "401":
+          description: Token ausente, inválido ou expirado
+  /doacoes:
+    get:
+      summary: Lista as doações com doador e itens vinculados
+      responses:
+        "200":
+          description: Lista de doações retornada
+        "401":
+          description: Token ausente, inválido ou expirado
+    post:
+      summary: Registra uma nova doação com seus itens em transação
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DoacaoEntrada"
+      responses:
+        "201":
+          description: Doação registrada com sucesso
+        "400":
+          description: "Dados inválidos ou doador inexistente"
+        "401":
+          description: Token ausente, inválido ou expirado
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Login:
+      type: object
+      required: [email, senha]
+      properties:
+        email:
+          type: string
+          example: voluntario@acolhemar.org
+        senha:
+          type: string
+          example: acolhemar123
+    DoadorEntrada:
+      type: object
+      required: [nome, cpf, email, telefone]
+      properties:
+        nome:
+          type: string
+        cpf:
+          type: string
+        email:
+          type: string
+        telefone:
+          type: string
+    DoacaoEntrada:
+      type: object
+      required: [id_doador, data_doacao, itens]
+      properties:
+        id_doador:
+          type: integer
+        data_doacao:
+          type: string
+          format: date
+        status:
+          type: string
+          enum: [Pendente, Entregue, Cancelada]
+        data_entrega:
+          type: string
+          format: date
+          nullable: true
+        descricao:
+          type: string
+          nullable: true
+        itens:
+          type: array
+          items:
+            type: object
+            required: [categoria, nome, quantidade]
+            properties:
+              categoria:
+                type: string
+              nome:
+                type: string
+              quantidade:
+                type: integer
+                minimum: 1

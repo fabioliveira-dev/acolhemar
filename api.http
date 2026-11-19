@@ -1,0 +1,72 @@
+### 1. Saúde da API (pública - esperado: 200)
+GET http://localhost:3000/api/health
+
+### 2. Sem token (esperado: 401 Token ausente)
+POST http://localhost:3000/api/doadores
+Content-Type: application/json
+
+{
+  "nome": "Teste sem token",
+  "cpf": "000.000.000-00",
+  "email": "semtoken@email.com",
+  "telefone": "(14) 99999-0000"
+}
+
+### 3. Login com senha errada (esperado: 401 E-mail ou senha inválidos)
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "voluntario@acolhemar.org",
+  "senha": "errada"
+}
+
+### 4. Login com e-mail inexistente (esperado: 401 mesma mensagem)
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "naoexiste@acolhemar.org",
+  "senha": "acolhemar123"
+}
+
+### 5. Login sem senha (esperado: 400 Informe e-mail e senha)
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "voluntario@acolhemar.org"
+}
+
+### 6. Login correto: guarda o token na variável "login" (esperado: 200)
+# @name login
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "voluntario@acolhemar.org",
+  "senha": "acolhemar123"
+}
+
+###
+@token = {{login.response.body.token}}
+
+### 7. Listar doadores com token (esperado: 200)
+GET http://localhost:3000/api/doadores
+Authorization: Bearer {{token}}
+
+### 8. Cadastrar doador com token (esperado: 201)
+POST http://localhost:3000/api/doadores
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nome": "Doador do Teste",
+  "cpf": "987.654.321-00",
+  "email": "doador.teste@email.com",
+  "telefone": "(14) 99888-7766"
+}
+
+### 9. Token adulterado (esperado: 401 Token inválido ou expirado)
+GET http://localhost:3000/api/doadores
+Authorization: Bearer {{token}}x
