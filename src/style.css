@@ -355,3 +355,53 @@ button:disabled {
     grid-template-columns: repeat(3, 1fr);
   }
 }
+/* Autenticação: cabeçalho com usuário/Sair e tela de login */
+.topo-usuario {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.topo .usuario {
+  color: #e6f2f5;
+  font-size: 0.925rem;
+}
+
+.topo #sair {
+  min-height: 36px;
+  padding: 6px 12px;
+}
+
+.login {
+  max-width: 400px;
+  margin: 48px auto 16px;
+  padding: var(--espaco);
+}
+
+.login h1 {
+  text-align: center;
+  color: var(--cor-primaria);
+  margin-bottom: 4px;
+}
+
+.login .subtitulo {
+  text-align: center;
+  color: var(--cor-suave);
+  margin: 0 0 var(--espaco);
+}
+
+.login button[type="submit"] {
+  width: 100%;
+}
+
+.mensagem.info {
+  color: var(--cor-primaria);
+  background: #e3f2f6;
+}
+
+@media (min-width: 720px) {
+  .topo-usuario {
+    margin-top: 0;
+  }
+}
